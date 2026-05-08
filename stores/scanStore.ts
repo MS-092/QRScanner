@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { nanoid } from 'nanoid';
 
 export interface ScanResult {
   id: string;
@@ -7,6 +6,10 @@ export interface ScanResult {
   type: 'url' | 'text';
   timestamp: number;
 }
+
+const generateId = (): string => {
+  return Date.now().toString(36) + Math.random().toString(36).substring(2);
+};
 
 interface ScanStore {
   scans: ScanResult[];
@@ -20,7 +23,7 @@ export const useScanStore = create<ScanStore>((set) => ({
   addScan: (data, type) =>
     set((state) => ({
       scans: [
-        { id: nanoid(), data, type, timestamp: Date.now() },
+        { id: generateId(), data, type, timestamp: Date.now() },
         ...state.scans,
       ],
     })),
