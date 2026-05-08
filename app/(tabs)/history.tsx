@@ -8,7 +8,7 @@ import {
   Pressable,
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
-import { ClockCounterClockwise, Copy, Trash, Link as LinkIcon, TextT } from '@phosphor-icons/react';
+import { ClockCounterClockwise, Copy, Trash, Link as LinkIcon, Article } from '@phosphor-icons/react';
 import { useScanStore } from '../../stores/scanStore';
 
 const ACCENT = '#E85A3C';
@@ -52,7 +52,7 @@ export default function HistoryScreen() {
         {item.type === 'url' ? (
           <LinkIcon size={20} color={ACCENT} weight="duotone" />
         ) : (
-          <TextT size={20} color={TEXT_SECONDARY} weight="duotone" />
+          <Article size={20} color={TEXT_SECONDARY} weight="duotone" />
         )}
       </View>
       <View style={styles.scanContent}>
