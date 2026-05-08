@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   useColorScheme,
 } from 'react-native';
-import { Gear, Sun, Moon, Info } from '@phosphor-icons/react';
 
 const ACCENT = '#E85A3C';
 const SURFACE = '#16161A';
@@ -28,9 +27,9 @@ export default function SettingsScreen() {
           <View style={styles.settingLeft}>
             <View style={styles.settingIconContainer}>
               {darkMode ? (
-                <Moon size={20} color={ACCENT} weight="duotone" />
+                <Text style={{ fontSize: 20, color: ACCENT }}>☾</Text>
               ) : (
-                <Sun size={20} color={ACCENT} weight="duotone" />
+                <Text style={{ fontSize: 20, color: ACCENT }}>☀</Text>
               )}
             </View>
             <Text style={styles.settingLabel}>Dark Mode</Text>
@@ -63,7 +62,7 @@ export default function SettingsScreen() {
       </View>
 
       <View style={styles.footer}>
-        <Info size={16} color={TEXT_SECONDARY} weight="duotone" />
+        <Text style={{ fontSize: 16, color: TEXT_SECONDARY }}>ℹ</Text>
         <Text style={styles.footerText}>Made with care</Text>
       </View>
     </View>

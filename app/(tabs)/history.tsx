@@ -8,7 +8,6 @@ import {
   Pressable,
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
-import { ClockCounterClockwise, Copy, Trash, Link as LinkIcon, Article } from '@phosphor-icons/react';
 import { useScanStore } from '../../stores/scanStore';
 
 const ACCENT = '#E85A3C';
@@ -50,9 +49,9 @@ export default function HistoryScreen() {
     >
       <View style={styles.scanIconContainer}>
         {item.type === 'url' ? (
-          <LinkIcon size={20} color={ACCENT} weight="duotone" />
+          <Text style={{ fontSize: 20, color: ACCENT }}>🔗</Text>
         ) : (
-          <Article size={20} color={TEXT_SECONDARY} weight="duotone" />
+          <Text style={{ fontSize: 20, color: TEXT_SECONDARY }}>📄</Text>
         )}
       </View>
       <View style={styles.scanContent}>
@@ -75,13 +74,13 @@ export default function HistoryScreen() {
           style={styles.actionButton}
           onPress={() => handleCopy(item.data)}
         >
-          <Copy size={16} color={TEXT_SECONDARY} weight="duotone" />
+          <Text style={{ fontSize: 16, color: TEXT_SECONDARY }}>⎘</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.actionButton, styles.actionButtonDelete]}
           onPress={() => removeScan(item.id)}
         >
-          <Trash size={16} color={ACCENT} weight="duotone" />
+          <Text style={{ fontSize: 16, color: ACCENT }}>🗑</Text>
         </TouchableOpacity>
       </View>
     </Pressable>
@@ -107,7 +106,7 @@ export default function HistoryScreen() {
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <View style={styles.emptyIconContainer}>
-              <ClockCounterClockwise size={40} color={BORDER} weight="duotone" />
+              <Text style={{ fontSize: 40, color: BORDER }}>◷</Text>
             </View>
             <Text style={styles.emptyTitle}>No Scans Yet</Text>
             <Text style={styles.emptySubtitle}>

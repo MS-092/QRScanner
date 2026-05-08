@@ -1,22 +1,21 @@
 import Tabs from 'expo-router/tabs';
 import { useColorScheme, View, Text } from 'react-native';
-import { QrCode, ClockCounterClockwise, Gear } from '@phosphor-icons/react';
 
 const ACCENT = '#E85A3C';
 const SURFACE = '#16161A';
 const BORDER = '#2A2A30';
 
 function TabIcon({ name, color, size }: { name: string; color: string; size: number }) {
-  switch (name) {
-    case 'scanner':
-      return <QrCode size={size} color={color} weight="duotone" />;
-    case 'history':
-      return <ClockCounterClockwise size={size} color={color} weight="duotone" />;
-    case 'settings':
-      return <Gear size={size} color={color} weight="duotone" />;
-    default:
-      return null;
-  }
+  const iconMap: Record<string, string> = {
+    scanner: '⌘',
+    history: '◷',
+    settings: '⚙',
+  };
+  return (
+    <View style={{ width: size, height: size, justifyContent: 'center', alignItems: 'center' }}>
+      <Text style={{ fontSize: size * 0.6, color }}>{iconMap[name] || '○'}</Text>
+    </View>
+  );
 }
 
 export default function TabLayout() {

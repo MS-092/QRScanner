@@ -6,11 +6,9 @@ import {
   TouchableOpacity,
   Platform,
   Animated,
-  Pressable,
 } from 'react-native';
 import { CameraView, useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
 import * as Clipboard from 'expo-clipboard';
-import { QrCode, Copy, ArrowClockwise, Link } from '@phosphor-icons/react';
 import { LinkConfirmationModal } from '../../components/LinkConfirmationModal';
 import { useScanStore } from '../../stores/scanStore';
 
@@ -78,7 +76,7 @@ export default function ScannerScreen() {
       <View style={styles.container}>
         <View style={styles.webContainer}>
           <View style={styles.webIcon}>
-            <QrCode size={48} color={ACCENT} weight="duotone" />
+            <Text style={{ fontSize: 40, color: ACCENT }}>⌘</Text>
           </View>
           <Text style={styles.webTitle}>QR Scanner</Text>
           <Text style={styles.webMessage}>
@@ -105,7 +103,7 @@ export default function ScannerScreen() {
       <View style={styles.container}>
         <View style={styles.permissionContainer}>
           <View style={styles.permissionIcon}>
-            <QrCode size={32} color={ACCENT} weight="duotone" />
+            <Text style={{ fontSize: 24, color: ACCENT }}>⌘</Text>
           </View>
           <Text style={styles.permissionTitle}>Camera Access Needed</Text>
           <Text style={styles.permissionText}>
@@ -157,7 +155,7 @@ export default function ScannerScreen() {
               <View style={styles.resultCard}>
                 <View style={styles.resultHeader}>
                   {isUrl(lastResult) ? (
-                    <Link size={16} color={ACCENT} weight="duotone" />
+                    <Text style={{ fontSize: 16, color: ACCENT }}>🔗</Text>
                   ) : null}
                   <Text style={styles.resultLabel} numberOfLines={1}>
                     {lastResult}
@@ -165,14 +163,14 @@ export default function ScannerScreen() {
                 </View>
                 <View style={styles.resultActions}>
                   <TouchableOpacity style={styles.actionBtn} onPress={handleCopy}>
-                    <Copy size={18} color={TEXT_SECONDARY} weight="duotone" />
+                    <Text style={{ fontSize: 18, color: TEXT_SECONDARY }}>⎘</Text>
                     <Text style={styles.actionBtnText}>Copy</Text>
                   </TouchableOpacity>
                   <TouchableOpacity 
                     style={[styles.actionBtn, styles.actionBtnPrimary]} 
                     onPress={handleRescan}
                   >
-                    <ArrowClockwise size={18} color={TEXT_PRIMARY} weight="duotone" />
+                    <Text style={{ fontSize: 18, color: TEXT_PRIMARY }}>↻</Text>
                     <Text style={[styles.actionBtnText, styles.actionBtnTextPrimary]}>Scan Again</Text>
                   </TouchableOpacity>
                 </View>

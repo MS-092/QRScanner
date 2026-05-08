@@ -7,7 +7,6 @@ import {
   StyleSheet,
   Linking,
 } from 'react-native';
-import { ArrowSquareOut, X, Globe } from '@phosphor-icons/react';
 
 const ACCENT = '#E85A3C';
 const SURFACE = '#16161A';
@@ -64,11 +63,11 @@ export function LinkConfirmationModal({
       <View style={styles.overlay}>
         <View style={styles.modal}>
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <X size={20} color={TEXT_SECONDARY} weight="bold" />
+            <Text style={{ fontSize: 18, color: TEXT_SECONDARY }}>✕</Text>
           </TouchableOpacity>
           
           <View style={styles.iconContainer}>
-            <Globe size={28} color={ACCENT} weight="duotone" />
+            <Text style={{ fontSize: 28, color: ACCENT }}>🌐</Text>
           </View>
           
           <Text style={styles.title}>Open Link?</Text>
@@ -91,7 +90,7 @@ export function LinkConfirmationModal({
               style={styles.openButton}
               onPress={handleOpen}
             >
-              <ArrowSquareOut size={18} color={TEXT_PRIMARY} weight="duotone" />
+              <Text style={{ fontSize: 18, color: TEXT_PRIMARY }}>↗</Text>
               <Text style={styles.openText}>Open Link</Text>
             </TouchableOpacity>
           </View>
