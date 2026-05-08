@@ -24,7 +24,6 @@ export default function ScannerScreen() {
   const [scanned, setScanned] = useState(false);
   const [lastResult, setLastResult] = useState<string | null>(null);
   const [showLinkModal, setShowLinkModal] = useState(false);
-  const [pendingUrl, setPendingUrl] = useState<string | null>(null);
   const [pulseAnim] = useState(new Animated.Value(1));
   const addScan = useScanStore((state) => state.addScan);
 
@@ -49,7 +48,6 @@ export default function ScannerScreen() {
     ]).start();
 
     if (isUrl(data)) {
-      setPendingUrl(data);
       setShowLinkModal(true);
     } else {
       addScan(data, 'text');
@@ -152,7 +150,7 @@ export default function ScannerScreen() {
 
       <LinkConfirmationModal
         visible={showLinkModal}
-        url={pendingUrl || lastResult || ''}
+        url={lastResult || ''}
         onClose={() => {
           setShowLinkModal(false);
         }}
