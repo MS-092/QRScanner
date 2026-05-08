@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { nanoid } from 'nanoid';
 
 export interface ScanResult {
   id: string;
@@ -19,7 +20,7 @@ export const useScanStore = create<ScanStore>((set) => ({
   addScan: (data, type) =>
     set((state) => ({
       scans: [
-        { id: Date.now().toString(), data, type, timestamp: Date.now() },
+        { id: nanoid(), data, type, timestamp: Date.now() },
         ...state.scans,
       ],
     })),
