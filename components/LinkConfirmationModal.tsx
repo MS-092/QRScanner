@@ -24,11 +24,13 @@ export function LinkConfirmationModal({
       const canOpen = await Linking.canOpenURL(url);
       if (canOpen) {
         await Linking.openURL(url);
+        onClose();
+      } else {
+        console.warn('Cannot open URL:', url);
       }
     } catch (error) {
       console.error('Failed to open URL:', error);
     }
-    onClose();
   };
 
   const getDomain = (urlString: string): string => {
