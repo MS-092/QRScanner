@@ -12,17 +12,22 @@ interface LinkConfirmationModalProps {
   visible: boolean;
   url: string;
   onClose: () => void;
+  onOpenAndAddScan?: (url: string) => void;
 }
 
 export function LinkConfirmationModal({
   visible,
   url,
   onClose,
+  onOpenAndAddScan,
 }: LinkConfirmationModalProps) {
   const handleOpen = async () => {
     try {
       const canOpen = await Linking.canOpenURL(url);
       if (canOpen) {
+        if (onOpenAndAddScan) {
+          onOpenAndAddScan(url);
+        }
         await Linking.openURL(url);
         onClose();
       } else {
