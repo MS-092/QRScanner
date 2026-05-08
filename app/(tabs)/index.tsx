@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,11 +6,19 @@ import {
   TouchableOpacity,
   Platform,
   Animated,
+  Pressable,
 } from 'react-native';
 import { CameraView, useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
 import * as Clipboard from 'expo-clipboard';
+import { QrCode, Copy, ArrowClockwise, Link } from '@phosphor-icons/react';
 import { LinkConfirmationModal } from '../../components/LinkConfirmationModal';
 import { useScanStore } from '../../stores/scanStore';
+
+const ACCENT = '#E85A3C';
+const SURFACE = '#16161A';
+const SURFACE_LIGHT = '#1E1E24';
+const TEXT_PRIMARY = '#FFFFFF';
+const TEXT_SECONDARY = '#9A9AA0';
 
 const isWeb = Platform.OS === 'web';
 
@@ -24,7 +32,7 @@ export default function ScannerScreen() {
   const [scanned, setScanned] = useState(false);
   const [lastResult, setLastResult] = useState<string | null>(null);
   const [showLinkModal, setShowLinkModal] = useState(false);
-  const [pulseAnim] = useState(new Animated.Value(1));
+  const pulseAnim = useRef(new Animated.Value(1)).current;
   const addScan = useScanStore((state) => state.addScan);
 
   const handleBarCodeScanned = (result: BarcodeScanningResult) => {
@@ -36,13 +44,13 @@ export default function ScannerScreen() {
 
     Animated.sequence([
       Animated.timing(pulseAnim, {
-        toValue: 1.1,
-        duration: 100,
+        toValue: 1.02,
+        duration: 150,
         useNativeDriver: true,
       }),
       Animated.timing(pulseAnim, {
         toValue: 1,
-        duration: 100,
+        duration: 150,
         useNativeDriver: true,
       }),
     ]).start();
@@ -68,11 +76,15 @@ export default function ScannerScreen() {
   if (isWeb) {
     return (
       <View style={styles.container}>
-        <View style={styles.webMessageContainer}>
+        <View style={styles.webContainer}>
+          <View style={styles.webIcon}>
+            <QrCode size={48} color={ACCENT} weight="duotone" />
+          </View>
           <Text style={styles.webTitle}>QR Scanner</Text>
           <Text style={styles.webMessage}>
             This app requires a mobile device with a camera to scan QR codes.
           </Text>
+          <Text style={styles.webHint}>Open on your iPhone or Android with Expo Go</Text>
         </View>
       </View>
     );
@@ -81,7 +93,9 @@ export default function ScannerScreen() {
   if (!permission) {
     return (
       <View style={styles.container}>
-        <Text style={styles.message}>Requesting camera permission...</Text>
+        <View style={styles.permissionContainer}>
+          <Text style={styles.permissionText}>Requesting camera permission...</Text>
+        </View>
       </View>
     );
   }
@@ -89,10 +103,18 @@ export default function ScannerScreen() {
   if (!permission.granted) {
     return (
       <View style={styles.container}>
-        <Text style={styles.message}>We need your camera permission to scan QR codes</Text>
-        <TouchableOpacity style={styles.button} onPress={requestPermission}>
-          <Text style={styles.buttonText}>Grant Permission</Text>
-        </TouchableOpacity>
+        <View style={styles.permissionContainer}>
+          <View style={styles.permissionIcon}>
+            <QrCode size={32} color={ACCENT} weight="duotone" />
+          </View>
+          <Text style={styles.permissionTitle}>Camera Access Needed</Text>
+          <Text style={styles.permissionText}>
+            We need your camera permission to scan QR codes
+          </Text>
+          <TouchableOpacity style={styles.permissionButton} onPress={requestPermission}>
+            <Text style={styles.permissionButtonText}>Grant Permission</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
@@ -106,42 +128,59 @@ export default function ScannerScreen() {
         onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
       >
         <View style={styles.overlay}>
-          <View style={styles.topOverlay} />
-          <Animated.View
-            style={[
-              styles.middleRow,
-              scanned ? { transform: [{ scale: pulseAnim }] } : {},
-            ]}
-          >
+          <View style={styles.topOverlay}>
+            {!scanned && (
+              <View style={styles.instructionBadge}>
+                <Text style={styles.instructionBadgeText}>Position QR code in frame</Text>
+              </View>
+            )}
+          </View>
+          
+          <Animated.View style={[styles.middleRow, { transform: [{ scale: pulseAnim }] }]}>
             <View style={styles.sideOverlay} />
             <View style={styles.scanArea}>
-              <View style={[styles.corner, styles.topLeft]} />
-              <View style={[styles.corner, styles.topRight]} />
-              <View style={[styles.corner, styles.bottomLeft]} />
-              <View style={[styles.corner, styles.bottomRight]} />
+              <View style={styles.scanCornerTopLeft} />
+              <View style={styles.scanCornerTopRight} />
+              <View style={styles.scanCornerBottomLeft} />
+              <View style={styles.scanCornerBottomRight} />
+              {scanned && (
+                <View style={styles.scanSuccessIndicator}>
+                  <View style={styles.successDot} />
+                </View>
+              )}
             </View>
             <View style={styles.sideOverlay} />
           </Animated.View>
+
           <View style={styles.bottomOverlay}>
-            <Text style={styles.instructionText}>
-              {scanned ? 'QR Code detected!' : 'Align QR code within the frame'}
-            </Text>
-            {scanned && lastResult && (
-              <View style={styles.resultContainer}>
-                <Text style={styles.resultText} numberOfLines={3}>
-                  {lastResult}
-                </Text>
-                <View style={styles.resultButtons}>
-                  <TouchableOpacity style={styles.actionButton} onPress={handleCopy}>
-                    <Text style={styles.actionButtonText}>Copy</Text>
+            {scanned && lastResult ? (
+              <View style={styles.resultCard}>
+                <View style={styles.resultHeader}>
+                  {isUrl(lastResult) ? (
+                    <Link size={16} color={ACCENT} weight="duotone" />
+                  ) : null}
+                  <Text style={styles.resultLabel} numberOfLines={1}>
+                    {lastResult}
+                  </Text>
+                </View>
+                <View style={styles.resultActions}>
+                  <TouchableOpacity style={styles.actionBtn} onPress={handleCopy}>
+                    <Copy size={18} color={TEXT_SECONDARY} weight="duotone" />
+                    <Text style={styles.actionBtnText}>Copy</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[styles.actionButton, styles.primaryButton]}
+                  <TouchableOpacity 
+                    style={[styles.actionBtn, styles.actionBtnPrimary]} 
                     onPress={handleRescan}
                   >
-                    <Text style={styles.actionButtonText}>Scan Again</Text>
+                    <ArrowClockwise size={18} color={TEXT_PRIMARY} weight="duotone" />
+                    <Text style={[styles.actionBtnText, styles.actionBtnTextPrimary]}>Scan Again</Text>
                   </TouchableOpacity>
                 </View>
+              </View>
+            ) : (
+              <View style={styles.scanHint}>
+                <View style={styles.scanHintDot} />
+                <Text style={styles.scanHintText}>Align QR code within frame</Text>
               </View>
             )}
           </View>
@@ -151,12 +190,8 @@ export default function ScannerScreen() {
       <LinkConfirmationModal
         visible={showLinkModal}
         url={lastResult || ''}
-        onClose={() => {
-          setShowLinkModal(false);
-        }}
-        onOpenAndAddScan={(url) => {
-          addScan(url, 'url');
-        }}
+        onClose={() => setShowLinkModal(false)}
+        onOpenAndAddScan={(url) => addScan(url, 'url')}
       />
     </View>
   );
@@ -175,134 +210,237 @@ const styles = StyleSheet.create({
   },
   topOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    paddingBottom: 20,
+  },
+  instructionBadge: {
+    backgroundColor: 'rgba(232, 90, 60, 0.15)',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(232, 90, 60, 0.3)',
+  },
+  instructionBadgeText: {
+    color: TEXT_PRIMARY,
+    fontSize: 13,
+    fontWeight: '500',
   },
   middleRow: {
     flexDirection: 'row',
-    height: 280,
+    height: 260,
   },
   sideOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
   },
   scanArea: {
-    width: 250,
-    height: 250,
+    width: 220,
+    height: 220,
     position: 'relative',
   },
-  corner: {
+  scanCornerTopLeft: {
     position: 'absolute',
-    width: 30,
-    height: 30,
-    borderColor: '#fff',
-  },
-  topLeft: {
     top: 0,
     left: 0,
-    borderTopWidth: 4,
-    borderLeftWidth: 4,
-    borderTopLeftRadius: 8,
+    width: 40,
+    height: 40,
+    borderTopWidth: 3,
+    borderLeftWidth: 3,
+    borderColor: ACCENT,
+    borderTopLeftRadius: 12,
   },
-  topRight: {
+  scanCornerTopRight: {
+    position: 'absolute',
     top: 0,
     right: 0,
-    borderTopWidth: 4,
-    borderRightWidth: 4,
-    borderTopRightRadius: 8,
+    width: 40,
+    height: 40,
+    borderTopWidth: 3,
+    borderRightWidth: 3,
+    borderColor: ACCENT,
+    borderTopRightRadius: 12,
   },
-  bottomLeft: {
+  scanCornerBottomLeft: {
+    position: 'absolute',
     bottom: 0,
     left: 0,
-    borderBottomWidth: 4,
-    borderLeftWidth: 4,
-    borderBottomLeftRadius: 8,
+    width: 40,
+    height: 40,
+    borderBottomWidth: 3,
+    borderLeftWidth: 3,
+    borderColor: ACCENT,
+    borderBottomLeftRadius: 12,
   },
-  bottomRight: {
+  scanCornerBottomRight: {
+    position: 'absolute',
     bottom: 0,
     right: 0,
-    borderBottomWidth: 4,
-    borderRightWidth: 4,
-    borderBottomRightRadius: 8,
+    width: 40,
+    height: 40,
+    borderBottomWidth: 3,
+    borderRightWidth: 3,
+    borderColor: ACCENT,
+    borderBottomRightRadius: 12,
+  },
+  scanSuccessIndicator: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -12,
+    marginLeft: -12,
+  },
+  successDot: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: ACCENT,
   },
   bottomOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
     alignItems: 'center',
-    paddingTop: 30,
+    justifyContent: 'center',
+    paddingBottom: 40,
   },
-  instructionText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '500',
-    textAlign: 'center',
-  },
-  resultContainer: {
-    marginTop: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 12,
+  resultCard: {
+    backgroundColor: SURFACE,
+    borderRadius: 16,
     padding: 16,
     width: '90%',
-    maxWidth: 320,
+    maxWidth: 340,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
-  resultText: {
-    color: '#fff',
+  resultHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 16,
+    paddingHorizontal: 4,
+  },
+  resultLabel: {
+    color: TEXT_PRIMARY,
     fontSize: 14,
-    textAlign: 'center',
-    marginBottom: 12,
+    flex: 1,
+    lineHeight: 20,
   },
-  resultButtons: {
+  resultActions: {
     flexDirection: 'row',
     gap: 12,
   },
-  actionButton: {
+  actionBtn: {
     flex: 1,
-    backgroundColor: '#333',
-    paddingVertical: 12,
-    borderRadius: 8,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 12,
+    backgroundColor: SURFACE_LIGHT,
+    borderRadius: 10,
   },
-  primaryButton: {
-    backgroundColor: '#007AFF',
+  actionBtnPrimary: {
+    backgroundColor: ACCENT,
   },
-  actionButtonText: {
-    color: '#fff',
+  actionBtnText: {
+    color: TEXT_SECONDARY,
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  actionBtnTextPrimary: {
+    color: TEXT_PRIMARY,
+  },
+  scanHint: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  scanHintDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: ACCENT,
+  },
+  scanHintText: {
+    color: TEXT_PRIMARY,
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '500',
   },
-  message: {
-    textAlign: 'center',
-    fontSize: 16,
-    color: '#fff',
-    marginBottom: 20,
-    paddingHorizontal: 20,
-  },
-  button: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  webMessageContainer: {
+  permissionContainer: {
+    flex: 1,
+    backgroundColor: '#0A0A0C',
+    justifyContent: 'center',
     alignItems: 'center',
-    padding: 40,
-    backgroundColor: '#1a1a2e',
-    margin: 20,
-    borderRadius: 16,
+    paddingHorizontal: 40,
+  },
+  permissionIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 20,
+    backgroundColor: SURFACE,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  permissionTitle: {
+    color: TEXT_PRIMARY,
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  permissionText: {
+    color: TEXT_SECONDARY,
+    fontSize: 15,
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 24,
+  },
+  permissionButton: {
+    backgroundColor: ACCENT,
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    borderRadius: 12,
+  },
+  permissionButtonText: {
+    color: TEXT_PRIMARY,
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  webContainer: {
+    flex: 1,
+    backgroundColor: '#0A0A0C',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 40,
+  },
+  webIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 24,
+    backgroundColor: SURFACE,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
   },
   webTitle: {
+    color: TEXT_PRIMARY,
     fontSize: 28,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 20,
+    fontWeight: '700',
+    marginBottom: 12,
   },
   webMessage: {
-    fontSize: 18,
-    color: '#ccc',
+    color: TEXT_SECONDARY,
+    fontSize: 16,
     textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: 16,
+  },
+  webHint: {
+    color: ACCENT,
+    fontSize: 13,
+    fontWeight: '500',
   },
 });

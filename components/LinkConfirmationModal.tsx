@@ -7,6 +7,13 @@ import {
   StyleSheet,
   Linking,
 } from 'react-native';
+import { ArrowSquareOut, X, Globe } from '@phosphor-icons/react';
+
+const ACCENT = '#E85A3C';
+const SURFACE = '#16161A';
+const SURFACE_LIGHT = '#1E1E24';
+const TEXT_PRIMARY = '#FFFFFF';
+const TEXT_SECONDARY = '#9A9AA0';
 
 interface LinkConfirmationModalProps {
   visible: boolean;
@@ -56,22 +63,35 @@ export function LinkConfirmationModal({
     >
       <View style={styles.overlay}>
         <View style={styles.modal}>
+          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+            <X size={20} color={TEXT_SECONDARY} weight="bold" />
+          </TouchableOpacity>
+          
+          <View style={styles.iconContainer}>
+            <Globe size={28} color={ACCENT} weight="duotone" />
+          </View>
+          
           <Text style={styles.title}>Open Link?</Text>
           <Text style={styles.domain}>{getDomain(url)}</Text>
-          <Text style={styles.url} numberOfLines={2}>
-            {url}
-          </Text>
+          
+          <View style={styles.urlContainer}>
+            <Text style={styles.urlText} numberOfLines={2}>
+              {url}
+            </Text>
+          </View>
+
           <View style={styles.buttons}>
             <TouchableOpacity
-              style={[styles.button, styles.cancelButton]}
+              style={styles.cancelButton}
               onPress={onClose}
             >
               <Text style={styles.cancelText}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.button, styles.openButton]}
+              style={styles.openButton}
               onPress={handleOpen}
             >
+              <ArrowSquareOut size={18} color={TEXT_PRIMARY} weight="duotone" />
               <Text style={styles.openText}>Open Link</Text>
             </TouchableOpacity>
           </View>
@@ -84,62 +104,99 @@ export function LinkConfirmationModal({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: 24,
   },
   modal: {
-    backgroundColor: '#1a1a2e',
-    borderRadius: 16,
+    backgroundColor: SURFACE,
+    borderRadius: 20,
     padding: 24,
     width: '100%',
     maxWidth: 340,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#2A2A30',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: SURFACE_LIGHT,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  iconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 20,
+    backgroundColor: 'rgba(232, 90, 60, 0.12)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 8,
+    marginBottom: 20,
   },
   title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 16,
+    fontSize: 22,
+    fontWeight: '700',
+    color: TEXT_PRIMARY,
+    marginBottom: 6,
     textAlign: 'center',
   },
   domain: {
     fontSize: 16,
-    color: '#007AFF',
-    marginBottom: 8,
+    color: ACCENT,
+    fontWeight: '600',
+    marginBottom: 16,
     textAlign: 'center',
   },
-  url: {
-    fontSize: 14,
-    color: '#888',
+  urlContainer: {
+    backgroundColor: SURFACE_LIGHT,
+    borderRadius: 10,
+    padding: 12,
+    width: '100%',
     marginBottom: 24,
+  },
+  urlText: {
+    fontSize: 13,
+    color: TEXT_SECONDARY,
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: 18,
   },
   buttons: {
     flexDirection: 'row',
     gap: 12,
-  },
-  button: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: 10,
-    alignItems: 'center',
+    width: '100%',
   },
   cancelButton: {
-    backgroundColor: '#333',
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    backgroundColor: SURFACE_LIGHT,
   },
   openButton: {
-    backgroundColor: '#007AFF',
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: ACCENT,
   },
   cancelText: {
-    color: '#fff',
-    fontSize: 16,
+    color: TEXT_SECONDARY,
+    fontSize: 15,
     fontWeight: '600',
   },
   openText: {
-    color: '#fff',
-    fontSize: 16,
+    color: TEXT_PRIMARY,
+    fontSize: 15,
     fontWeight: '600',
   },
 });
