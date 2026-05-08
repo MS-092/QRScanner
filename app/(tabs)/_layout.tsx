@@ -9,7 +9,6 @@ function TabIcon({ name, color, size }: { name: string; color: string; size: num
   const iconMap: Record<string, string> = {
     scanner: '⌘',
     history: '◷',
-    settings: '⚙',
   };
   return (
     <View style={{ width: size, height: size, justifyContent: 'center', alignItems: 'center' }}>
@@ -72,15 +71,6 @@ export default function TabLayout() {
           headerTitle: 'Scan History',
           tabBarIcon: ({ color }) => (
             <TabIcon name="history" color={color} size={24} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: 'Settings',
-          tabBarIcon: ({ color }) => (
-            <TabIcon name="settings" color={color} size={24} />
           ),
         }}
       />
