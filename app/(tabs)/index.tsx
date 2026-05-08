@@ -36,8 +36,15 @@ export default function ScannerScreen() {
   const handleBarCodeScanned = (result: BarcodeScanningResult) => {
     if (scanned) return;
 
-    setScanned(true);
     const data = result.data;
+
+    // Input length validation - prevent memory issues from oversized QR data
+    if (data.length > 4296) {
+      console.warn('QR data exceeds maximum length');
+      return;
+    }
+
+    setScanned(true);
     setLastResult(data);
 
     Animated.sequence([

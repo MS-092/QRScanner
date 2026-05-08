@@ -29,6 +29,22 @@ export function LinkConfirmationModal({
 }: LinkConfirmationModalProps) {
   const handleOpen = async () => {
     try {
+      const parsedUrl = new URL(url);
+      
+      // Block dangerous URL schemes
+      const dangerousProtocols = ['javascript:', 'data:', 'vbscript:'];
+      if (dangerousProtocols.includes(parsedUrl.protocol)) {
+        console.warn('Blocked dangerous URL scheme:', parsedUrl.protocol);
+        return;
+      }
+      
+      // Only allow http, https, tel, and mailto
+      const allowedProtocols = ['http:', 'https:', 'tel:', 'mailto:'];
+      if (!allowedProtocols.includes(parsedUrl.protocol)) {
+        console.warn('Unsupported URL protocol:', parsedUrl.protocol);
+        return;
+      }
+
       const canOpen = await Linking.canOpenURL(url);
       if (canOpen) {
         if (onOpenAndAddScan) {
